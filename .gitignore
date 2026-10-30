@@ -1,0 +1,17 @@
+# Arquivos compilados do Java
+out/
+*.class
+
+# Cache e ambientes virtuais do Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Arquivos de sistema operacional e IDEs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
