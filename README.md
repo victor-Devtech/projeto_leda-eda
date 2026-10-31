@@ -10,6 +10,7 @@ Implementação experimental e análise de desempenho de algoritmos de ordenaç�
 - `src/br/edu/uepb/eda/bench/`: Motores de medição de ordenação (`SortBenchmark`) e de busca (`SearchBenchmark`).
 - `src/br/edu/uepb/eda/Main.java`: Ponto de entrada com suporte a múltiplos modos de execução em thread dedicada com pilha de 1 GB.
 - `scripts/graficos.py`: Script Python (`pandas` e `matplotlib`) para geração automática de gráficos em escala logarítmica e tabelas em Markdown.
+- `docs/`: Relatório de análise (`relatorio.docx`).
 
 ## Como Compilar e Executar
 
