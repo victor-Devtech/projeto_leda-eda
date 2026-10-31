@@ -1,13 +1,12 @@
-// TODO: Conferir o particionamento com o slide do professor da disciplina.
 package br.edu.uepb.eda.sorting;
 
 import java.util.Random;
 
 /**
  * Implementações do algoritmo Quick Sort para arrays de inteiros (int[]).
- * Contém a versão do slide (particionamento de Lomuto com pivô fixo no último elemento)
+ * Contém a versão do slide (particionamento "à la Hoare" com pivô fixo no primeiro elemento)
  * e a versão slideShuffle (embaralhamento Fisher-Yates com Random(42) dentro do tempo
- * medido, seguido do mesmo particionamento de Lomuto).
+ * medido, seguido do mesmo particionamento do slide).
  */
 public final class QuickSort {
 
@@ -18,8 +17,8 @@ public final class QuickSort {
     }
 
     /**
-     * Versão do slide: Quick Sort recursivo utilizando particionamento de Lomuto
-     * com pivô fixo no último elemento da partição (a[dir]).
+     * Versão do slide: Quick Sort recursivo utilizando particionamento "à la Hoare"
+     * com pivô fixo no primeiro elemento da partição (a[esq]).
      * Degenera para O(n^2) e profundidade de recursão O(n) em vetores já ordenados ou em ordem inversa.
      *
      * @param a vetor de inteiros a ser ordenado in-place
@@ -33,7 +32,7 @@ public final class QuickSort {
 
     /**
      * Versão slide + shuffle: realiza o embaralhamento de Fisher-Yates com semente fixa (42)
-     * dentro do tempo medido antes de invocar o mesmo Quick Sort de Lomuto.
+     * dentro do tempo medido antes de invocar o mesmo Quick Sort do slide.
      * Evita a degeneração sistemática em entradas ordenadas ou inversas.
      *
      * @param a vetor de inteiros a ser ordenado in-place
@@ -58,30 +57,34 @@ public final class QuickSort {
 
     private static void quickSort(int[] a, int esq, int dir) {
         if (esq < dir) {
-            int indicePivo = particionarLomuto(a, esq, dir);
+            int indicePivo = particionar(a, esq, dir);
             quickSort(a, esq, indicePivo - 1);
             quickSort(a, indicePivo + 1, dir);
         }
     }
 
     /**
-     * Particionamento de Lomuto utilizando o último elemento (a[dir]) como pivô.
+     * Particionamento do slide ("à la Hoare") utilizando o primeiro elemento (a[esq]) como pivô.
      */
-    private static int particionarLomuto(int[] a, int esq, int dir) {
-        int pivo = a[dir];
-        int i = esq - 1;
-        for (int j = esq; j < dir; j++) {
-            if (a[j] <= pivo) {
+    private static int particionar(int[] a, int esq, int dir) {
+        int pivo = a[esq];
+        int i = esq + 1;
+        int j = dir;
+        while (i <= j) {
+            if (a[i] <= pivo) {
                 i++;
+            } else if (a[j] > pivo) {
+                j--;
+            } else {
                 int temp = a[i];
                 a[i] = a[j];
                 a[j] = temp;
             }
         }
-        int temp = a[i + 1];
-        a[i + 1] = a[dir];
-        a[dir] = temp;
-        return i + 1;
+        int temp = a[esq];
+        a[esq] = a[j];
+        a[j] = temp;
+        return j;
     }
 
     /**

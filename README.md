@@ -41,6 +41,45 @@ run.bat --tudo
 - `--busca`: Executa apenas o benchmark completo de busca.
 - `--tudo`: Executa os benchmarks reais completos de ordenação e busca em sequência.
 
+## Como Reproduzir os Resultados Oficiais
+
+A ordenação roda em uma única JVM. As buscas rodam em 5 JVMs separadas, porque a variação do JIT entre JVMs pode superar a diferença prevista pela teoria para a busca binária. O resumo final das buscas usa a mediana entre as JVMs:
+
+```bash
+./run.sh --ordenacao       # no Windows: run.bat --ordenacao
+python3 scripts/busca_jvms.py
+python3 scripts/graficos.py
+```
+
+Em `resultados/busca_resumo.csv`, `media_ns` é a mediana das médias de cada JVM e `desvio_ns` é o desvio padrão amostral entre essas médias. Os dados de cada JVM ficam em `resultados/busca_jvms/`.
+
+Para comparar o efeito de dividir a JVM entre os algoritmos, o script abaixo refaz o benchmark com uma JVM nova para cada combinação, uma por vez, e grava em `resultados_individual/`, sem alterar `resultados/`:
+
+```bash
+python3 scripts/benchmark_individual.py
+```
+
+## Como Rodar os Testes Unitários
+
+Os testes ficam em `test/`, não usam bibliotecas externas e não alteram a pasta `resultados/`:
+
+```bash
+# Linux / macOS
+chmod +x testes.sh
+./testes.sh
+
+# Windows (Prompt de Comando)
+testes.bat
+```
+
+Os testes do script de gráficos exigem `pandas` e `matplotlib`:
+
+```bash
+python3 -m unittest discover -s test -p "test_*.py"
+```
+
+A estabilidade não é coberta por esses testes, pois valores `int` iguais são indistinguíveis. Ela é conferida pela leitura do código.
+
 ## Como Gerar Gráficos e Tabelas
 
 Após a execução de `--rapido` ou `--tudo`, gere os gráficos em `resultados/graficos/` e o relatório tabular em `resultados/tabelas.md` executando:

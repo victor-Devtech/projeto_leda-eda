@@ -150,6 +150,65 @@ public final class SortBenchmark {
         System.out.println("[ORDENACAO] Benchmark finalizado. Arquivos gerados em: " + pastaResultados.toAbsolutePath());
     }
 
+    /**
+     * Executa uma única combinação de algoritmo, cenário e tamanho, usada para medir cada
+     * combinação em uma JVM própria.
+     *
+     * @param pastaResultados diretório de saída
+     * @param grupo           grupo do algoritmo ("A" ou "B")
+     * @param nomeAlgoritmo   nome registrado do algoritmo
+     * @param cenario         cenário da entrada
+     * @param n               tamanho do vetor
+     * @param totalExecucoes  total de execuções
+     * @param warmupExecucoes execuções iniciais descartadas como warm-up
+     * @throws IOException em caso de falha na escrita dos arquivos CSV
+     */
+    public static void executarCombinacao(
+            Path pastaResultados,
+            String grupo,
+            String nomeAlgoritmo,
+            Cenario cenario,
+            int n,
+            int totalExecucoes,
+            int warmupExecucoes) throws IOException {
+
+        List<AlgoritmoOrdenacao> algoritmos = switch (grupo) {
+            case "A" -> ALGORITMOS_GRUPO_A;
+            case "B" -> ALGORITMOS_GRUPO_B;
+            default -> throw new IllegalArgumentException("Grupo desconhecido: " + grupo);
+        };
+        AlgoritmoOrdenacao algoritmo = algoritmos.stream()
+                .filter(alg -> alg.nome().equals(nomeAlgoritmo))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Algoritmo desconhecido no grupo " + grupo + ": " + nomeAlgoritmo));
+
+        Files.createDirectories(pastaResultados);
+        Path arquivoBruto = pastaResultados.resolve("ordenacao_bruto.csv");
+        Path arquivoResumo = pastaResultados.resolve("ordenacao_resumo.csv");
+
+        try (PrintWriter outBruto = new PrintWriter(Files.newBufferedWriter(arquivoBruto, StandardCharsets.UTF_8));
+             PrintWriter outResumo = new PrintWriter(Files.newBufferedWriter(arquivoResumo, StandardCharsets.UTF_8))) {
+
+            outBruto.println("grupo,algoritmo,cenario,n,execucao,warmup,tempo_ns");
+            outResumo.println("grupo,algoritmo,cenario,n,media_ms,desvio_ms,mediana_ms,min_ms,max_ms,status");
+
+            executarGrupo(
+                    grupo,
+                    List.of(algoritmo),
+                    new int[]{n},
+                    new Cenario[]{cenario},
+                    totalExecucoes,
+                    warmupExecucoes,
+                    outBruto,
+                    outResumo,
+                    System.nanoTime(),
+                    0,
+                    totalExecucoes
+            );
+        }
+    }
+
     private static int executarGrupo(
             String nomeGrupo,
             List<AlgoritmoOrdenacao> algoritmos,

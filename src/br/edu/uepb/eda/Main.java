@@ -36,7 +36,11 @@ public final class Main {
 
         Runnable tarefa = () -> {
             try {
-                executarModo(modo);
+                if ("--combinacao".equals(modo)) {
+                    executarCombinacao(args);
+                } else {
+                    executarModo(modo);
+                }
             } catch (Throwable t) {
                 erroCapturado.set(t);
             }
@@ -91,6 +95,37 @@ public final class Main {
                 imprimirUso();
                 throw new IllegalArgumentException("Argumento desconhecido: " + modo);
             }
+        }
+    }
+
+    /**
+     * Modo --combinacao: mede uma única combinação nesta JVM, com o protocolo padrão.
+     * Formatos: --combinacao ordenacao GRUPO ALGORITMO CENARIO N e --combinacao busca ALGORITMO N.
+     */
+    private static void executarCombinacao(String[] args) throws Exception {
+        if (args.length == 6 && "ordenacao".equals(args[1])) {
+            AmbienteUtil.salvarAmbiente(PASTA_RESULTADOS);
+            SortBenchmark.executarCombinacao(
+                    PASTA_RESULTADOS,
+                    args[2],
+                    args[3],
+                    Cenario.valueOf(args[4]),
+                    Integer.parseInt(args[5]),
+                    SortBenchmark.TOTAL_EXECUCOES_PADRAO,
+                    SortBenchmark.WARMUP_EXECUCOES_PADRAO
+            );
+        } else if (args.length == 4 && "busca".equals(args[1])) {
+            AmbienteUtil.salvarAmbiente(PASTA_RESULTADOS);
+            SearchBenchmark.executarCombinacao(
+                    PASTA_RESULTADOS,
+                    args[2],
+                    Integer.parseInt(args[3]),
+                    SearchBenchmark.TOTAL_EXECUCOES_PADRAO,
+                    SearchBenchmark.WARMUP_EXECUCOES_PADRAO
+            );
+        } else {
+            imprimirUso();
+            throw new IllegalArgumentException("Argumentos inválidos para --combinacao: " + Arrays.toString(args));
         }
     }
 
@@ -195,5 +230,7 @@ public final class Main {
         System.out.println("  --ordenacao  Roda apenas o benchmark real de ordenação (Grupos A e B)");
         System.out.println("  --busca      Roda apenas o benchmark real de busca");
         System.out.println("  --tudo       Roda todos os benchmarks reais (ordenação + busca)");
+        System.out.println("  --combinacao ordenacao GRUPO ALGORITMO CENARIO N   Mede uma combinação de ordenação");
+        System.out.println("  --combinacao busca ALGORITMO N                     Mede uma combinação de busca");
     }
 }
