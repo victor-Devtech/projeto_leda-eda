@@ -30,11 +30,9 @@ public final class SelectionSort {
                     indiceMinimo = j;
                 }
             }
-            if (indiceMinimo != i) {
-                int temp = a[i];
-                a[i] = a[indiceMinimo];
-                a[indiceMinimo] = temp;
-            }
+            int temp = a[i];
+            a[i] = a[indiceMinimo];
+            a[indiceMinimo] = temp;
         }
     }
 

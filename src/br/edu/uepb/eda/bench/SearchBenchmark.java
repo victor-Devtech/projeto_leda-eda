@@ -77,13 +77,57 @@ public final class SearchBenchmark {
             int[] tamanhos,
             int totalExecucoes,
             int warmupExecucoes) throws IOException {
+        executar(pastaResultados, ALGORITMOS_BUSCA, tamanhos, totalExecucoes, warmupExecucoes);
+    }
+
+    /**
+     * Executa uma única combinação de busca e tamanho, usada para medir cada combinação
+     * em uma JVM própria.
+     *
+     * @param pastaResultados diretório de saída
+     * @param nomeAlgoritmo   nome registrado da busca
+     * @param n               tamanho do vetor ordenado
+     * @param totalExecucoes  total de execuções
+     * @param warmupExecucoes execuções iniciais descartadas como warm-up
+     * @throws IOException em caso de erro de escrita nos CSVs
+     */
+    public static void executarCombinacao(
+            Path pastaResultados,
+            String nomeAlgoritmo,
+            int n,
+            int totalExecucoes,
+            int warmupExecucoes) throws IOException {
+
+        AlgoritmoBusca algoritmo = ALGORITMOS_BUSCA.stream()
+                .filter(alg -> alg.nome().equals(nomeAlgoritmo))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Busca desconhecida: " + nomeAlgoritmo));
+        executar(pastaResultados, List.of(algoritmo), new int[]{n}, totalExecucoes, warmupExecucoes);
+    }
+
+    /**
+     * Executa o benchmark de busca parametrizado sobre a lista de algoritmos informada.
+     *
+     * @param pastaResultados diretório de saída
+     * @param algoritmos      buscas a avaliar
+     * @param tamanhos        tamanhos n de vetores ordenados a avaliar
+     * @param totalExecucoes  total de execuções por combinação
+     * @param warmupExecucoes execuções iniciais descartadas como warm-up
+     * @throws IOException em caso de erro de escrita nos CSVs
+     */
+    static void executar(
+            Path pastaResultados,
+            List<AlgoritmoBusca> algoritmos,
+            int[] tamanhos,
+            int totalExecucoes,
+            int warmupExecucoes) throws IOException {
 
         Files.createDirectories(pastaResultados);
         Path arquivoBruto = pastaResultados.resolve("busca_bruto.csv");
         Path arquivoResumo = pastaResultados.resolve("busca_resumo.csv");
 
         int execucoesValidas = totalExecucoes - warmupExecucoes;
-        int totalPassos = tamanhos.length * ALGORITMOS_BUSCA.size() * totalExecucoes;
+        int totalPassos = tamanhos.length * algoritmos.size() * totalExecucoes;
         int passosConcluidos = 0;
         long inicioGlobalNs = System.nanoTime();
         long sink = 0L;
@@ -98,7 +142,7 @@ public final class SearchBenchmark {
                 // Gera o vetor ordenado UMA vez para o tamanho n
                 int[] vetorOrdenado = DataGenerator.ordenado(n);
 
-                for (AlgoritmoBusca alg : ALGORITMOS_BUSCA) {
+                for (AlgoritmoBusca alg : algoritmos) {
                     System.gc();
 
                     double[] temposValidosNs = new double[execucoesValidas];

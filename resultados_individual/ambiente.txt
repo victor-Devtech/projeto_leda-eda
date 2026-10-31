@@ -1,0 +1,7 @@
+=== AMBIENTE DE EXECUÇÃO DO BENCHMARK (EDA/LEDA - UEPB) ===
+Sistema Operacional : Windows 11 (10.0)
+Arquitetura         : amd64
+Numero de Nucleos   : 16
+Memoria Max. da JVM : 4096.00 MB (4294967296 bytes)
+Versao do Java      : 26.0.1 (Java HotSpot(TM) 64-Bit Server VM - Oracle Corporation)
+Data/Hora           : 2026-10-31 01:48:31
